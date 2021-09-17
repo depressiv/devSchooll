@@ -20,6 +20,19 @@ app.get('/matricula', async (req, resp) => {
 app.post('/matricula', async (req, resp) => {
     try{
         let { nome, chamada, curso, turma } = req.body;
+        
+        if(nome == '' || nome == null || chamada == '' || chamada == null || curso == '' || curso == null || turma == '' || turma == null)
+        return resp.send({erro: "um ou mais campos não estao preenchidos"})
+        
+        if(isNaN(chamada))
+         return resp.send({erro: "chamada precisa ser numero"})
+        
+         if(chamada < 0)
+         return resp.send({erro: "chamada precisa ser numero positivo"})
+        
+         let u = await db.tb_matricula.findOne({where: {nm_aluno: nome}})
+         if ( u != null)
+         return resp.send( { erro: "aluno já cadastrado"})
 
         let r = await db.tb_matricula.create({
             nm_aluno: nome,
@@ -37,6 +50,19 @@ app.put('/matricula/:id', async (req, resp) => {
     try{
         let { nome, chamada, curso, turma } = req.body;
         let { id } = req.params;
+
+        if(nome == '' || nome == null || chamada == '' || chamada == null || curso == '' || curso == null || turma == '' || turma == null)
+        return resp.send({erro: "um ou mais campos não estao preenchidos"})
+        
+        if(isNaN(chamada))
+         return resp.send({erro: "chamada precisa ser numero"})
+        
+         if(chamada < 0)
+         return resp.send({erro: "chamada precisa ser numero positivo"})
+        
+         let u = await db.tb_matricula.findOne({where: {nm_aluno: nome}})
+         if ( u != null)
+         return resp.send( { erro: "aluno já cadastrado"})
 
         let r = await db.tb_matricula.update(
             {

@@ -7,15 +7,19 @@ import { Container, Conteudo } from './styled'
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
+import LoadingBar from 'react-top-loading-bar';
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; 
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import Api from '../../service/api'
 const api = new Api();
 
 export default function Index() {
+
+   const loading = useRef(null);
 
     const [alunos, setAlunos] = useState([ ]);
     const [nome, setNome] = useState([ ]);
@@ -30,22 +34,28 @@ export default function Index() {
     }
 
     
-
+    
     async function inserir(){
+        loading.current.continuousStart();
+
         if (idAlterando == 0) {
             let r = await api.inserir(nome, chamada, curso, turma);
+            loading.current.complete();
         
             if(r.erro) 
                 alert(r.erro);
-            else    
-                alert('aluno inserido!');
+            else  
+            loading.current.complete();  
+            toast.dark('aluno inserido!');
         } else {
             let r = await api.alterar(idAlterando, nome, chamada, curso, turma)
-            
+            loading.current.complete();
+
         if(r.erro) 
             alert(r.erro);
         else 
-            alert('aluno alterado!');
+        loading.current.complete();
+            toast.dark('aluno alterado!');
         }
         
         LimparCampos();
@@ -104,6 +114,8 @@ export default function Index() {
             <Menu />
             <Conteudo>
                 <Cabecalho />
+                <ToastContainer />
+                <LoadingBar color="red" ref={loading} />
                 <div class="body-right-box">
                     <div class="new-student-box">
                         
@@ -163,10 +175,13 @@ export default function Index() {
 
                                 <tr className={i % 2 == 0 ? "linha-alternada" : "" }>
                                     <td> {item.id_matricula} </td>
-                                    <td title = {item.nm_aluno}>
-                                    {item.nm_aluno != null && item.nm_aluno.lenght >= 25
-                                         ? item.nm_aluno.substr(0, 25) + "..." 
-                                        : item.nm_aluno } </td>
+
+                                    <td title={item.nm_aluno}>                                                 
+                                        {item.nm_aluno != null && item.nm_aluno.length >= 25
+                                        ? item.nm_aluno.substr(0, 25) + "..." 
+                                        : item.nm_aluno } 
+                                    </td>
+
                                     <td> {item.nr_chamada} </td>
                                     <td> {item.nm_turma} </td>
                                     <td> {item.nm_curso} </td>
